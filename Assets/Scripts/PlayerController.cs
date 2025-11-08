@@ -6,19 +6,17 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rigidBody;
     public float speed = 5f;
     public float jumpForce = 10f;
-
-    private bool isGrounded = false;
-
+    
+    [SerializeField] private bool isGrounded = false;
+    public LayerMask groundLayer;
+    
     private Animator animator;
-
     private SpriteRenderer spriteRenderer;
     
     void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
-
         animator = GetComponent<Animator>();
-
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -26,25 +24,38 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetAxis("Horizontal") != 0)
         {
-            rigidBody.linearVelocityX = Input.GetAxis("Horizontal") * speed;
-
-            animator.SetBool("waliking", true);
-
-            spriteRenderer.flipX = Input.GetAxis("Horizontal") * speed < 0;
+            rigidBody.linearVelocity = 
+                new Vector2(Input.GetAxis("Horizontal") * speed, 
+                    rigidBody.linearVelocity.y);
+            
+            animator.SetBool("Walking", true);
+            if (rigidBody.linearVelocity.x < 0)
+                spriteRenderer.flipX = true;
+            if (rigidBody.linearVelocity.x > 0)
+                spriteRenderer.flipX = false;
+            
         }
         else
-            animator.SetBool("waliking", false);
+            animator.SetBool("Walking", false);
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded == true)
         {
-            isGrounded = false;
             rigidBody.AddForceY(jumpForce);
+            animator.SetTrigger("Jump");
+            isGrounded = false;
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D anotherObject)
+    void LateUpdate()
     {
-        if (anotherObject.gameObject.layer.Equals(LayerMask.NameToLayer("Ground")))
+        animator.SetBool("isGrounded", isGrounded);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
             isGrounded = true;
     }
+
+    
 }
