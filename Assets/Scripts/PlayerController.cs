@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,6 +32,7 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("Walking", true);
             if (rigidBody.linearVelocity.x < 0)
                 spriteRenderer.flipX = true;
+
             if (rigidBody.linearVelocity.x > 0)
                 spriteRenderer.flipX = false;
             
@@ -38,7 +40,7 @@ public class PlayerController : MonoBehaviour
         else
             animator.SetBool("Walking", false);
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded == true)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rigidBody.AddForceY(jumpForce);
             animator.SetTrigger("Jump");
@@ -56,6 +58,4 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
             isGrounded = true;
     }
-
-    
 }
